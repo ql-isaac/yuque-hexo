@@ -15,7 +15,8 @@ module.exports = async function(post) {
   if (config.imgCdn.enabled) {
     post = await img2Cdn(post);
   }
-  const { body } = post;
-  const raw = formatRaw(body);
+  let { body } = post;
+  let raw = formatRaw(body);
+  raw = raw.replace(/<br \/>/g, '\n\n')
   return raw;
 };

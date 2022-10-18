@@ -65,7 +65,7 @@ function formatRaw(body) {
     .replace(hiddenContent, '')
     .replace(multiBr, '<br>')
     .replace(multiBrEnd, '<br />\n')
-    .replace(brBug, '\n')
+//    .replace(brBug, '\n')
     .replace(emptyAnchor, '');
   return formatMarkdown(body);
 }
