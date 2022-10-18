@@ -108,15 +108,14 @@ imgCdn 语雀图片转图床配置说明
 | ------------- | ------------------------------------ | -------------------- |
 | enabled       | 是否开启                           | false |
 | imageBed      | 选择将图片上传的图床，目前支持腾讯云(cos)、阿里云(oss)和七牛云(qiniu)，默认使用七牛云                           | 'qiniu' |
-| host          | 使用七牛云图床时，需要指定CDN域名前缀
+| host          | 使用七牛云和腾讯云(cos)图床时，需要指定CDN域名前缀
 | bucket        | 图床的bucket名称                     | -          |
 | region        | 图床的的region               |  -                     |
 | prefixKey     | 文件前缀                                | -                |
 
-> host 说明
+> host 示例
 >
-> 由于七牛云默认使用CND进行图片外链访问（默认提供30天的临时域名或者添加自定义CDN域名），所以需要指定访问的域名前缀
-> 例如：'host': `http://image.1874.cool`，域名后面不需要加斜杠
+> `https://img.imql.life`，域名后面不需要加斜杠
 
 > bucket和region说明
 > 

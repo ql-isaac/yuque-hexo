@@ -37,7 +37,7 @@ class CosClient {
         Region: this.config.region, // 存储桶所在地域，必须字段
         Key: `${this.config.prefixKey}/${fileName}`, //  文件名  必须
       });
-      return `https://${this.config.bucket}.cos.${this.config.region}.myqcloud.com/${this.config.prefixKey}/${fileName}`;
+      return `${this.config.host}/${this.config.prefixKey}/${fileName}`;
     } catch (e) {
       return '';
     }
@@ -59,7 +59,7 @@ class CosClient {
         StorageClass: 'STANDARD', // 上传模式（标准模式）
         Body: imgBuffer, // 上传文件对象
       });
-      return `https://${res.Location}`;
+      return `${this.config.host}/${this.config.prefixKey}/${fileName}`;
     } catch (e) {
       out.error(`上传图片失败，请检查: ${e}`);
       process.exit(-1);
