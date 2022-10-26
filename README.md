@@ -46,6 +46,12 @@ A downloader for articles from yuque（语雀知识库同步工具）
 - 腾讯云[API密钥管理](https://console.cloud.tencent.com/cam/capi)
 - 阿里云[API密钥管理](https://ram.console.aliyun.com/manage/ak)
 - 七牛云[API密钥管理](https://portal.qiniu.com/user/key)
+- 又拍云[操作员管理](https://console.upyun.com/account/operators/)
+- GitHub图床[生成Github Token](https://github.com/settings/tokens)
+> 又拍云的SECRET_ID=操作员账号，SECRET_KEY=操作员密码
+> 
+> Github图床的`SECRET_ID=用户名`，`SECRET_KEY=Github Token`。
+> 注意在生成`token`时，记得勾选上读写权限，即 `write:packages`和`read:packages`
 
 - 在设置YUQUE_TOKEN的基础上配置SECRET_ID和SECRET_KEY
 - 命令执行时传入环境变量
@@ -74,6 +80,7 @@ A downloader for articles from yuque（语雀知识库同步工具）
     "lastGeneratePath": "lastGeneratePath.log",
     "imgCdn": {
       "enabled": false,
+      "concurrency": 0,
       "imageBed": "qiniu",
       "host": "",
       "bucket": "",
@@ -104,18 +111,29 @@ imgCdn 语雀图片转图床配置说明
 
 注意：开启后会将匹配到的所有的图片都上传到图床
 
-| 参数名        | 含义                                 | 默认值               |
-| ------------- | ------------------------------------ | -------------------- |
-| enabled       | 是否开启                           | false |
-| imageBed      | 选择将图片上传的图床，目前支持腾讯云(cos)、阿里云(oss)和七牛云(qiniu)，默认使用七牛云                           | 'qiniu' |
-| host          | 使用七牛云和腾讯云(cos)图床时，需要指定CDN域名前缀
-| bucket        | 图床的bucket名称                     | -          |
-| region        | 图床的的region               |  -                     |
-| prefixKey     | 文件前缀                                | -                |
+| 参数名       | 含义                                                                                      | 默认值     |
+|-----------|-----------------------------------------------------------------------------------------|---------|
+| enabled   | 是否开启                                                                                    | false   |
+| concurrency | 上传图片并发数, 0代表无限制，使用github图床时，并发问题严重，建议设置为1                                               | 0       |
+| imageBed  | 选择将图片上传的图床<br/>目前支持腾讯云(cos)、阿里云(oss)和七牛云(qiniu)，又拍云(upyun)，Github图床(github)<br/>默认使用七牛云 | 'qiniu' |
+| host      | 使用七牛云/又拍云/腾讯云图床时，需要指定CDN域名前缀                                                                |         |
+| bucket    | 图床的bucket名称                                                                             | -       |
+| region    | 图床的的region                                                                              | -       |
+| prefixKey | 文件前缀                                                                                    | -       |
 
 > host 示例
 >
 > `https://img.imql.life`，域名后面不需要加斜杠
+
+> 又拍云和七牛云有点类似，默认使用临时域名访问，但不同的是又拍云的临时域名暂时是由`服务名.test.upcdn.net`组成，默认为http访问
+> 
+> 如果使用临时域名，host可不填。使用自定义域名，默认为http访问，如果需要指定协议为https，则需要填写完整的域名
+> 
+> 例如 'host': `upyun.1874.cool`或 `https://upyun.1874.cool ` 
+
+> Github图床的默认域名是`raw.githubusercontent.com`，如果要使用jsdelivr进行加速，可以配置`host`为`cdn.jsdelivr.net`，
+> 
+> 例如 'host': `cdn.jsdelivr.net`
 
 > bucket和region说明
 > 
@@ -125,7 +143,11 @@ imgCdn 语雀图片转图床配置说明
 > 
 > [获取七牛云的bucket(空间)和region(机房)](https://portal.qiniu.com/kodo/overview)，示例：{ bucket: "blog", region: "Zone_z2" }
 > 
-> 七牛云机房取值: 华东(Zone_z0)华北(Zone_z0)华南(Zone_z0)北美(Zone_z0)
+> 七牛云机房取值: 华东(Zone_z0)华北(Zone_z1)华南(Zone_z2)
+> 
+> 又拍云没有bucket和region的概念，只有服务名。所以这里的bucket=服务名，region暂时保留不需要填写
+> 
+> Github图床也没有bucket和region的概念。所以bucket=仓库名，region暂时保留不需要填写
 
 > prefixKey 说明
 >
@@ -134,6 +156,8 @@ imgCdn 语雀图片转图床配置说明
 > 如果想上传到指定目录blog/image下，则需要配置prefixKey为"prefixKey": "blog/image"。
 >
 > 目录名前后都不需要加斜杠
+
+> 配置示例: [yuque-hexo配置示例](https://github.com/LetTTGACO/yuque-hexo-example)
 
 
 ## Install
@@ -209,8 +233,20 @@ DEBUG=yuque-hexo.* yuque-hexo sync
 
 - yuque to hexo: [x-cold/blog](https://github.com/x-cold/blog/blob/master/package.json)
 - yuque to github repo: [txd-team/monthly](https://github.com/txd-team/monthly/blob/master/package.json)
+- [yuque-hexo配置示例](https://github.com/LetTTGACO/yuque-hexo-example)
 
 # Changelog
+
+### v1.9.5
+- 修复腾讯云图床/Github图床上传问题
+- 图片上传失败时，取消停止进程
+- 新增图片上传时的并发数concurrency，使用Github图床时，并发问题严重，建议设置为1
+
+### v1.9.4
+- 🔥 新增GitHub图床和又拍云图床
+
+### v1.9.2
+- 修复上传图片到图床时可能由于用户代理缺失导致403问题
 
 ### v1.9.1
 - 修复不使用图床配置时报错的问题

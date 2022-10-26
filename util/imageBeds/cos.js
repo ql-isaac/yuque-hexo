@@ -61,8 +61,8 @@ class CosClient {
       });
       return `${this.config.host}/${this.config.prefixKey}/${fileName}`;
     } catch (e) {
-      out.error(`上传图片失败，请检查: ${e}`);
-      process.exit(-1);
+      out.warn(`上传图片失败，请检查: ${e}`);
+      return '';
     }
   }
 }

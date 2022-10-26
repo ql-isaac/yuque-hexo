@@ -3,6 +3,7 @@
 // 七牛云图床
 const qiniu = require('qiniu');
 const out = require('../../lib/out');
+const { transformRes } = require('../index');
 
 const secretId = process.env.SECRET_ID;
 const secretKey = process.env.SECRET_KEY;
@@ -18,6 +19,7 @@ class QiniuClient {
       out.error('使用七牛云时，需要在imgCdn中指定域名host');
       process.exit(-1);
     }
+    out.info(`图床域名：${this.config.host}`);
     const mac = new qiniu.auth.digest.Mac(secretId, secretKey);
     const putPolicy = new qiniu.rs.PutPolicy({ scope: this.config.bucket }); // 配置
     this.uploadToken = putPolicy.uploadToken(mac); // 获取上传凭证
@@ -46,8 +48,7 @@ class QiniuClient {
     return await new Promise(resolve => {
       this.bucketManager.stat(this.config.bucket, `${this.config.prefixKey}/${fileName}`, (err, respBody, respInfo) => {
         if (err) {
-          out.error(`上传图片失败，请检查: ${err}`);
-          process.exit(-1);
+          out.warn(`检查图片信息时出错: ${transformRes(err)}`);
         } else {
           if (respInfo.statusCode === 200) {
             resolve(`${this.config.host}/${this.config.prefixKey}/${fileName}`);
@@ -71,14 +72,14 @@ class QiniuClient {
       this.formUploader.put(this.uploadToken, `${this.config.prefixKey}/${fileName}`, imgBuffer, this.putExtra, (respErr,
         respBody, respInfo) => {
         if (respErr) {
-          out.error(`上传图片失败，请检查: ${respErr}`);
-          process.exit(-1);
+          out.warn(`上传图片失败，请检查: ${transformRes(respErr)}`);
+          resolve('');
         }
         if (respInfo.statusCode === 200) {
           resolve(`${this.config.host}/${this.config.prefixKey}/${fileName}`);
         } else {
-          out.error(`上传图片失败，请检查: ${respInfo}`);
-          process.exit(-1);
+          out.warn(`上传图片失败，请检查: ${transformRes(respInfo)}`);
+          resolve('');
         }
       });
     });
